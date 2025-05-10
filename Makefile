@@ -10,7 +10,7 @@ pkgs	= $(shell go list ./... | grep -v vendor/)
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 MKFILE_DIR  := $(dir $(MKFILE_PATH))
 
-DOCKER_IMAGE_NAME ?= feiyu563/prometheus-alert
+DOCKER_IMAGE_NAME ?= xtlyk/prometheus-alert
 
 BRANCH      ?= $(shell git rev-parse --abbrev-ref HEAD)
 BUILDDATE   ?= $(shell date -I'seconds')

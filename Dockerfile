@@ -11,6 +11,8 @@ ENV GOPROXY https://goproxy.io
 
 COPY . $GOPATH/src/github.com/feiyu563/PrometheusAlert
 
+RUN make clean
+
 RUN make build
 
 # -----------------------------------------------------------------------------
