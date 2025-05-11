@@ -13,7 +13,7 @@ ENV GOPROXY https://goproxy.io
 
 COPY . $GOPATH/src/github.com/feiyu563/PrometheusAlert
 
-RUN make clean
+RUN rm -f $GOPATH/src/github.com/feiyu563/PrometheusAlert/PrometheusAlert
 
 RUN make build
 
