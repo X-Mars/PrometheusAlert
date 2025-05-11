@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 )
@@ -120,57 +119,28 @@ type TenantAccessResp struct {
 	TenantAccessToken string `json:"tenant_access_token"`
 }
 
-// 从text中取出告警名称、告警状态，当告警状态为resolved时，返回 告警信息 + 告警名称，其他值时，返回 恢复信息 + 告警名称 text例子如下
-///PrometheusAlert
-
-// Prometheus 恢复信息
-
-// 告警名称： ContainerRestart
-// 告警级别： warning
-// 告警状态： resolved
-// 开始时间： 2025-05-08T04:36:27.678Z
-// 结束时间： 2025-05-08T05:13:42.678Z
-// 告警主机： dev-2
-
-// 容器 doc-sync-api 发生重启，请及时查看!
-
-func GetAlertName(text string) string {
-	// 解析告警名称
-	lines := strings.Split(text, "\n")
-	alertname := ""
-	status := ""
-	instance := ""
-	for _, line := range lines {
-	 if strings.Contains(line, "告警名称：") {
-		parts := strings.Split(line, "：")
-		if len(parts) > 1 {
-		 alertname = strings.TrimSpace(parts[1])
-		}
-	 } else if strings.Contains(line, "告警状态：") {
-				parts := strings.Split(line, "：")
-				if len(parts) > 1 {
-				alertstatus := strings.TrimSpace(parts[1])
-				if alertstatus == "resolved" {
-					// 解析告警名称
-					status = "恢复"
-				} else {
-					// 解析告警名称
-					status = "告警"
-				}
-			}
-		} else if strings.Contains(line, "告警主机：") {
-			parts := strings.Split(line, "：")
-			if len(parts) > 1 {
-				instance = strings.TrimSpace(parts[1])
-			}
-		}
-	}
-	return "Prometheus " + status + " - " + instance + " " + alertname
- }
-
-
 func PostToFeiShuv2(title, text, Fsurl, userOpenId, logsign string) string {
-	title = GetAlertName(text)
+
+	lines := strings.Split(text, "\n")
+	var newLines []string
+	for _, line := range lines {
+		if strings.Contains(line, "标题：") {
+			parts := strings.Split(line, "标题：")
+			if len(parts) > 1 {
+					title = parts[1]
+			}
+			continue
+		} else if strings.Contains(line, "标题:") {
+			parts := strings.Split(line, "标题：")
+			if len(parts) > 1 {
+					title = parts[1]
+			}
+			continue
+		}
+		newLines = append(newLines, line)
+	}
+	text = strings.Join(newLines, "\n")
+	
 	var color string
 	if strings.Count(text, "resolved") > 0 && strings.Count(text, "firing") > 0 {
 		color = "orange"
